@@ -1,1 +1,3 @@
 http://deeplearning.net/data/mnist/mnist.pkl.gz
+
+sketch to photo：https://affinelayer.com/pixsrv/
