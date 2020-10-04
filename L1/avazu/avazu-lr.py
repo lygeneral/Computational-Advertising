@@ -1,14 +1,15 @@
 # 使用LR模型对Avazu CTR进行预估
 import pandas as pd
 import numpy as np
-from dummyPy import OneHotEncoder  # 超大规模数据one-hot编码
+# from dummyPy import OneHotEncoder  # 超大规模数据one-hot编码
+from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import SGDClassifier  # 梯度下降分类
 from sklearn.metrics import log_loss
 import matplotlib.pyplot as plt 
 import pickle
 
 ##==================== 设置文件路径File-Path (fp) ====================##
-file_path = '/home/admin/jupyter/avazu/'
+file_path = ''
 train_file = file_path + "train_sample.csv"
 test_file  = file_path + "test_sample.csv"
 
@@ -20,11 +21,11 @@ lr_model_file = file_path + "lr/lr_model"
 submission_file = file_path + "lr/LR_submission.csv"
 
 ##==================== LR 训练 ====================##
-print(onehot_encoder_file)
-onehot_encoder = pickle.load(open(onehot_encoder_file, 'rb'))
+# print(onehot_encoder_file)
+# onehot_encoder = pickle.load(open(onehot_encoder_file, 'rb'))
 
 # 一个chunk块为5万行
-chunksize = 50000
+chunksize = 1000
 df_train = pd.read_csv(train_file, dtype={'id':str}, index_col=None, chunksize=chunksize, iterator=True)
 
 # 使用LogLoss作为LR的损失函数
@@ -33,7 +34,7 @@ scores = []
 
 # 使用k和i调整训练规模，训练样本 = 所有样本 / k
 # 如果数据集不大的话，可以将k设置为1
-k = 100  
+k = 1
 i = 1
 for chunk in df_train:
     # 根据K drop掉样本
@@ -42,7 +43,7 @@ for chunk in df_train:
         continue
     print('training...')
     i = 1
-    df_train_chunk = onehot_encoder.transform(chunk)
+    df_train_chunk = chunk.apply(LabelEncoder().fit_transform)
     # LR训练
     feature_train = df_train_chunk.columns.drop(['id', 'click'])
     train_X = df_train_chunk[feature_train]
